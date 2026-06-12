@@ -11,194 +11,118 @@
   <link rel="apple-touch-icon" href="icon-192.svg">
   <title>メモ帳</title>
   <style>
-    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-
+    *, *::before, *::after { box-sizing:border-box; margin:0; padding:0; }
     :root {
-      --bg:     #1C1C1E;
-      --hd:     #2C2C2E;
-      --row:    #2C2C2E;
-      --hover:  #3A3A3C;
-      --border: #3A3A3C;
-      --accent: #FFD60A;
-      --text:   #F2F2F7;
-      --muted:  #8E8E93;
-      --danger: #FF453A;
-      --safe-top:    env(safe-area-inset-top, 0px);
-      --safe-bottom: env(safe-area-inset-bottom, 0px);
+      --bg:#1C1C1E; --hd:#2C2C2E; --hover:#3A3A3C; --border:#3A3A3C;
+      --accent:#FFD60A; --text:#F2F2F7; --muted:#8E8E93; --danger:#FF453A;
+      --safe-top:env(safe-area-inset-top,0px); --safe-bottom:env(safe-area-inset-bottom,0px);
+      --list-fs:13px; --editor-fs:15px;
     }
-
-    html, body {
-      height: 100%;
-      background: var(--bg);
-      color: var(--text);
-      font-family: 'Hiragino Kaku Gothic ProN', 'Noto Sans JP', sans-serif;
-      -webkit-text-size-adjust: 100%;
-      overscroll-behavior: none;
-    }
-
-    #app {
-      display: flex;
-      flex-direction: column;
-      height: 100dvh;
-      overflow: hidden;
-    }
+    html,body { height:100%; background:var(--bg); color:var(--text);
+      font-family:'Hiragino Kaku Gothic ProN','Noto Sans JP',sans-serif;
+      -webkit-text-size-adjust:100%; overscroll-behavior:none; }
+    #app { display:flex; flex-direction:column; height:100dvh; overflow:hidden; }
 
     /* ── HEADER ── */
-    header {
-      display: flex;
-      align-items: center;
-      gap: 12px;
-      padding: calc(14px + var(--safe-top)) 20px 14px;
-      background: var(--hd);
-      border-bottom: 1px solid var(--border);
-      flex-shrink: 0;
-    }
-    #header-title {
-      flex: 1;
-      font-size: 16px;
-      font-weight: 700;
-    }
-    #add-btn {
-      background: var(--accent);
-      color: #000;
-      border: none;
-      border-radius: 8px;
-      padding: 7px 16px;
-      font-size: 13px;
-      font-weight: 700;
-      cursor: pointer;
-      -webkit-tap-highlight-color: transparent;
-    }
-    #back-btn {
-      background: none;
-      border: none;
-      color: var(--accent);
-      font-size: 15px;
-      font-weight: 600;
-      cursor: pointer;
-      padding: 4px 0;
-      -webkit-tap-highlight-color: transparent;
-    }
-    #detail-date {
-      flex: 1;
-      font-size: 11px;
-      color: var(--muted);
-      text-align: center;
-    }
-    #del-note-btn {
-      background: none;
-      border: none;
-      color: var(--danger);
-      font-size: 13px;
-      font-weight: 600;
-      cursor: pointer;
-      padding: 4px 0;
-      -webkit-tap-highlight-color: transparent;
-    }
+    header { display:flex; align-items:center; gap:8px;
+      padding:calc(10px + var(--safe-top)) 12px 10px;
+      background:var(--hd); border-bottom:1px solid var(--border); flex-shrink:0; }
+    #header-title { flex:1; font-size:15px; font-weight:700; }
+    .hbtn { background:none; border:none; color:var(--accent); font-size:13px; font-weight:700;
+      cursor:pointer; padding:5px 8px; border-radius:7px; -webkit-tap-highlight-color:transparent;
+      white-space:nowrap; }
+    #add-btn { background:var(--accent); color:#000; border-radius:8px; }
+    #back-btn { font-size:14px; padding:4px 0; }
+    #detail-date { flex:1; font-size:10px; color:var(--muted); text-align:center; }
+    #del-note-btn { color:var(--danger); }
+    #save-btn { background:var(--accent); color:#000; border-radius:8px; font-size:12px; padding:5px 10px; }
 
     /* ── SEARCH ── */
-    #search-wrap {
-      padding: 10px 16px;
-      border-bottom: 1px solid var(--border);
-      flex-shrink: 0;
-    }
-    #search {
-      width: 100%;
-      background: var(--hover);
-      border: none;
-      border-radius: 8px;
-      color: var(--text);
-      padding: 9px 14px;
-      font-size: 14px;
-      outline: none;
-      -webkit-appearance: none;
-    }
-    #search::placeholder { color: var(--muted); }
+    #search-wrap { padding:6px 12px; border-bottom:1px solid var(--border); flex-shrink:0; }
+    #search { width:100%; background:var(--hover); border:none; border-radius:7px;
+      color:var(--text); padding:6px 12px; font-size:13px; outline:none; -webkit-appearance:none; }
+    #search::placeholder { color:var(--muted); }
 
     /* ── LIST ── */
-    #list-view { display: flex; flex-direction: column; flex: 1; overflow: hidden; }
-    #note-list {
-      list-style: none;
-      overflow-y: auto;
-      flex: 1;
-      -webkit-overflow-scrolling: touch;
-    }
+    #list-view { display:flex; flex-direction:column; flex:1; overflow:hidden; }
+    #note-list { list-style:none; overflow-y:auto; flex:1; -webkit-overflow-scrolling:touch; }
+
     .note-row {
-      display: flex;
-      align-items: center;
-      height: 48px;
-      padding: 0 16px;
-      gap: 10px;
-      border-bottom: 1px solid var(--border);
-      cursor: pointer;
-      -webkit-tap-highlight-color: transparent;
-      user-select: none;
+      display:flex; align-items:center; height:36px; padding:0 10px;
+      gap:6px; border-bottom:1px solid var(--border); cursor:pointer;
+      -webkit-tap-highlight-color:transparent; user-select:none; transition:background .1s;
+      touch-action:pan-y; /* 通常時は縦スクロール許可 */
     }
-    .note-row:active { background: var(--hover); }
-    .row-icon { font-size: 15px; flex-shrink: 0; }
-    .row-title {
-      flex: 1;
-      font-size: 14px;
-      font-weight: 500;
-      white-space: nowrap;
-      overflow: hidden;
-      text-overflow: ellipsis;
-    }
-    .row-date { font-size: 11px; color: var(--muted); flex-shrink: 0; }
-    .row-del {
-      background: none;
-      border: none;
-      color: var(--muted);
-      font-size: 20px;
-      cursor: pointer;
-      padding: 0 4px;
-      line-height: 1;
-      flex-shrink: 0;
-      -webkit-tap-highlight-color: transparent;
-    }
-    #empty-msg {
-      color: var(--muted);
-      font-size: 13px;
-      text-align: center;
-      padding: 48px 16px;
-    }
+    .note-row:active { background:var(--hover); }
+    .note-row.dragging { opacity:.35; background:var(--hover); }
+    .note-row.drag-over-top    { border-top:2px solid var(--accent); }
+    .note-row.drag-over-bottom { border-bottom:2px solid var(--accent); }
+    .note-row.sort-mode { touch-action:none; background:rgba(255,214,10,.04); }
+
+    .drag-handle { color:var(--muted); font-size:16px; flex-shrink:0;
+      cursor:grab; padding:0 2px; display:none; }
+    .note-row.sort-mode .drag-handle { display:block; }
+
+    .row-icon  { font-size:13px; flex-shrink:0; }
+    .row-title { flex:1; font-size:var(--list-fs); font-weight:500;
+      white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+    .row-date  { font-size:10px; color:var(--muted); flex-shrink:0; }
+    .row-del   { background:none; border:none; color:var(--muted); font-size:18px;
+      cursor:pointer; padding:0 3px; line-height:1; flex-shrink:0;
+      -webkit-tap-highlight-color:transparent; }
+    .note-row.sort-mode .row-del  { display:none; }
+    .note-row.sort-mode .row-date { display:none; }
+    #empty-msg { color:var(--muted); font-size:13px; text-align:center; padding:40px 16px; }
 
     /* ── DETAIL ── */
-    #detail-view { display: none; flex-direction: column; flex: 1; overflow: hidden; }
-    #detail-view.active { display: flex; }
-    #editor {
-      display: flex;
-      flex-direction: column;
-      flex: 1;
-      padding: 20px 20px calc(20px + var(--safe-bottom));
-      gap: 14px;
-      overflow: hidden;
-    }
-    #note-title {
-      background: transparent;
-      border: none;
-      border-bottom: 1px solid var(--border);
-      outline: none;
-      color: var(--text);
-      font-size: 22px;
-      font-weight: 700;
-      font-family: inherit;
-      padding-bottom: 10px;
-      width: 100%;
-    }
-    #note-body {
-      flex: 1;
-      background: transparent;
-      border: none;
-      outline: none;
-      color: var(--text);
-      font-size: 15px;
-      line-height: 1.85;
-      font-family: inherit;
-      resize: none;
-      width: 100%;
-    }
-    #note-title::placeholder, #note-body::placeholder { color: var(--muted); }
+    #detail-view { display:none; flex-direction:column; flex:1; overflow:hidden; }
+    #detail-view.active { display:flex; }
+    #editor { display:flex; flex-direction:column; flex:1;
+      padding:14px 16px calc(14px + var(--safe-bottom)); gap:10px; overflow:hidden; }
+    #note-title { background:transparent; border:none; border-bottom:1px solid var(--border);
+      outline:none; color:var(--text); font-size:calc(var(--editor-fs) + 5px); font-weight:700;
+      font-family:inherit; padding-bottom:8px; width:100%; }
+    #note-body  { flex:1; background:transparent; border:none; outline:none; color:var(--text);
+      font-size:var(--editor-fs); line-height:1.85; font-family:inherit; resize:none; width:100%; }
+    #note-title::placeholder,#note-body::placeholder { color:var(--muted); }
+
+    /* フォントサイズ調整バー（編集画面下部） */
+    #fs-bar { display:flex; align-items:center; gap:8px; flex-shrink:0;
+      padding:6px 0 calc(6px + var(--safe-bottom)); border-top:1px solid var(--border); }
+    #fs-bar label { font-size:11px; color:var(--muted); white-space:nowrap; }
+    #editor-fs-range { flex:1; accent-color:var(--accent); }
+    #editor-fs-val   { font-size:11px; color:var(--accent); min-width:30px; text-align:right; }
+
+    /* ── SETTINGS MODAL ── */
+    .modal-bg { position:fixed; inset:0; background:rgba(0,0,0,.6);
+      display:flex; align-items:flex-end; justify-content:center; z-index:100; }
+    .modal-bg.hidden { display:none; }
+    .modal { background:var(--hd); border-radius:18px 18px 0 0; width:100%; max-width:480px;
+      padding:18px 18px calc(18px + var(--safe-bottom)); }
+    .modal h2 { font-size:15px; font-weight:700; margin-bottom:16px; text-align:center; }
+    .modal-row { display:flex; align-items:center; padding:10px 0;
+      border-bottom:1px solid var(--border); gap:10px; }
+    .modal-row:last-child { border-bottom:none; }
+    .modal-label { font-size:13px; white-space:nowrap; }
+    .modal-row input[type=range] { flex:1; accent-color:var(--accent); }
+    .modal-row .val { font-size:12px; color:var(--accent); min-width:34px; text-align:right; }
+    .modal-close { width:100%; margin-top:14px; padding:11px; background:var(--hover);
+      border:none; border-radius:10px; color:var(--text); font-size:14px; font-weight:600; cursor:pointer; }
+    .modal-btn { flex:1; padding:10px 6px; border:none; border-radius:8px; font-size:12px;
+      font-weight:600; cursor:pointer; -webkit-tap-highlight-color:transparent; }
+    .modal-btn.export { background:var(--accent); color:#000; }
+    .modal-btn.import { background:var(--hover); color:var(--text); }
+    #csv-import { display:none; }
+
+    .sort-toggle { padding:5px 10px; border:1.5px solid var(--accent); border-radius:8px;
+      background:none; color:var(--accent); font-size:12px; font-weight:700; cursor:pointer;
+      -webkit-tap-highlight-color:transparent; flex-shrink:0; }
+    .sort-toggle.active { background:var(--accent); color:#000; }
+
+    /* 長押しヒント */
+    #longpress-hint { font-size:10px; color:var(--muted); text-align:center;
+      padding:3px 0 2px; flex-shrink:0; display:none; }
+    #longpress-hint.show { display:block; }
   </style>
 </head>
 <body>
@@ -208,54 +132,107 @@
   <div id="list-view">
     <header>
       <span id="header-title">📝 メモ帳</span>
-      <button id="add-btn">＋ 新規</button>
+      <button class="sort-toggle" id="sort-toggle">並替</button>
+      <button class="hbtn" id="settings-btn">⚙️</button>
+      <button class="hbtn" id="add-btn">＋ 新規</button>
     </header>
     <div id="search-wrap">
-      <input id="search" type="search" placeholder="🔍  検索…" autocomplete="off" autocorrect="off" spellcheck="false">
+      <input id="search" type="search" placeholder="🔍 検索…" autocomplete="off" autocorrect="off" spellcheck="false">
     </div>
+    <div id="longpress-hint">≡ ドラッグして並べ替え　／　「完了」で終了</div>
     <ul id="note-list"></ul>
   </div>
 
   <!-- DETAIL VIEW -->
   <div id="detail-view">
     <header>
-      <button id="back-btn">← 一覧</button>
+      <button class="hbtn" id="back-btn">← 一覧</button>
       <span id="detail-date"></span>
-      <button id="del-note-btn">削除</button>
+      <button class="hbtn" id="save-btn">💾 保存</button>
+      <button class="hbtn" id="del-note-btn">削除</button>
     </header>
     <div id="editor">
       <input id="note-title" type="text" placeholder="タイトル">
       <textarea id="note-body" placeholder="ここに書き始めてください…"></textarea>
+      <div id="fs-bar">
+        <label for="editor-fs-range">文字</label>
+        <input type="range" id="editor-fs-range" min="10" max="26" step="1" value="15">
+        <span id="editor-fs-val">15px</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- SETTINGS MODAL -->
+  <div class="modal-bg hidden" id="modal-bg">
+    <div class="modal">
+      <h2>⚙️ 設定</h2>
+      <div class="modal-row">
+        <span class="modal-label">一覧のフォントサイズ</span>
+        <input type="range" id="list-fs-range" min="10" max="22" step="1" value="13">
+        <span class="val" id="list-fs-val">13px</span>
+      </div>
+      <div class="modal-row">
+        <button class="modal-btn export" id="csv-export-btn">📤 CSV書き出し</button>
+        <button class="modal-btn import" id="csv-import-btn">📥 CSV取り込み</button>
+        <input type="file" id="csv-import" accept=".csv">
+      </div>
+      <button class="modal-close" id="modal-close">閉じる</button>
     </div>
   </div>
 
 </div>
-
 <script>
-const STORAGE_KEY = "memo-pwa-notes";
+const STORAGE_KEY  = "memo-pwa-notes";
+const SETTINGS_KEY = "memo-pwa-settings";
 
-let notes = [];
+let notes     = [];
 let currentId = null;
+let sortMode  = false;
+let dragEl    = null;
 
-// ── Storage ──────────────────────────────────────────────────
+// ── Storage ───────────────────────────────────────────────
 function load() {
   try { notes = JSON.parse(localStorage.getItem(STORAGE_KEY)) || []; } catch { notes = []; }
 }
 function save() {
   try { localStorage.setItem(STORAGE_KEY, JSON.stringify(notes)); } catch {}
 }
+function loadSettings() {
+  try {
+    const s = JSON.parse(localStorage.getItem(SETTINGS_KEY)) || {};
+    applyListFs(s.listFs   || 13);
+    applyEditorFs(s.editorFs || 15);
+  } catch {}
+}
+function saveSettings() {
+  const lfs = +document.getElementById("list-fs-range").value;
+  const efs = +document.getElementById("editor-fs-range").value;
+  try { localStorage.setItem(SETTINGS_KEY, JSON.stringify({listFs:lfs, editorFs:efs})); } catch {}
+}
+function applyListFs(v) {
+  document.documentElement.style.setProperty("--list-fs", v + "px");
+  document.getElementById("list-fs-range").value = v;
+  document.getElementById("list-fs-val").textContent = v + "px";
+}
+function applyEditorFs(v) {
+  document.documentElement.style.setProperty("--editor-fs", v + "px");
+  document.getElementById("editor-fs-range").value = v;
+  document.getElementById("editor-fs-val").textContent = v + "px";
+}
 
-// ── Helpers ──────────────────────────────────────────────────
+// ── Helpers ───────────────────────────────────────────────
 function fmt(iso) {
-  return new Date(iso).toLocaleDateString("ja-JP", {
-    month: "short", day: "numeric", hour: "2-digit", minute: "2-digit"
-  });
+  return new Date(iso).toLocaleDateString("ja-JP",
+    {month:"short", day:"numeric", hour:"2-digit", minute:"2-digit"});
 }
 function makeNote() {
-  return { id: Date.now(), title: "無題のメモ", body: "", updatedAt: new Date().toISOString() };
+  return {id:Date.now(), title:"無題のメモ", body:"", updatedAt:new Date().toISOString()};
+}
+function esc(s) {
+  return s.replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/"/g,"&quot;");
 }
 
-// ── Views ────────────────────────────────────────────────────
+// ── DOM refs ──────────────────────────────────────────────
 const listView   = document.getElementById("list-view");
 const detailView = document.getElementById("detail-view");
 const noteList   = document.getElementById("note-list");
@@ -263,14 +240,17 @@ const searchEl   = document.getElementById("search");
 const titleEl    = document.getElementById("note-title");
 const bodyEl     = document.getElementById("note-body");
 const detailDate = document.getElementById("detail-date");
+const sortToggle = document.getElementById("sort-toggle");
+const modalBg    = document.getElementById("modal-bg");
+const hint       = document.getElementById("longpress-hint");
 
+// ── Views ─────────────────────────────────────────────────
 function showList() {
   currentId = null;
   detailView.classList.remove("active");
   listView.style.display = "flex";
   renderList();
 }
-
 function showDetail(id) {
   currentId = id;
   const n = notes.find(x => x.id === id);
@@ -280,75 +260,191 @@ function showDetail(id) {
   titleEl.value = n.title;
   bodyEl.value  = n.body;
   detailDate.textContent = "最終更新: " + fmt(n.updatedAt);
-  titleEl.focus();
 }
 
+// ── Render list ───────────────────────────────────────────
 function renderList() {
   const q = searchEl.value.toLowerCase();
-  const filtered = notes.filter(n =>
-    n.title.toLowerCase().includes(q) || n.body.toLowerCase().includes(q)
-  );
+  const list = sortMode
+    ? [...notes]
+    : notes.filter(n => n.title.toLowerCase().includes(q) || n.body.toLowerCase().includes(q));
+
   noteList.innerHTML = "";
-  if (filtered.length === 0) {
+  if (list.length === 0) {
     const li = document.createElement("li");
     li.id = "empty-msg";
     li.textContent = q ? "一致するメモがありません" : "メモがありません。＋ で作成してください。";
     noteList.appendChild(li);
     return;
   }
-  filtered.forEach(n => {
+  list.forEach(n => {
     const li = document.createElement("li");
-    li.className = "note-row";
-    li.innerHTML = `
-      <span class="row-icon">📄</span>
-      <span class="row-title">${esc(n.title)}</span>
-      <span class="row-date">${fmt(n.updatedAt)}</span>
-      <button class="row-del" data-id="${n.id}" aria-label="削除">×</button>
-    `;
-    li.addEventListener("click", e => {
-      if (e.target.classList.contains("row-del")) return;
-      showDetail(n.id);
-    });
+    li.className = "note-row" + (sortMode ? " sort-mode" : "");
+    li.dataset.id = n.id;
+    li.innerHTML =
+      `<span class="drag-handle">≡</span>` +
+      `<span class="row-icon">📄</span>` +
+      `<span class="row-title">${esc(n.title)}</span>` +
+      `<span class="row-date">${fmt(n.updatedAt)}</span>` +
+      `<button class="row-del" data-id="${n.id}" aria-label="削除">×</button>`;
+
+    if (!sortMode) {
+      // 通常タップで開く
+      li.addEventListener("click", e => {
+        if (e.target.classList.contains("row-del")) return;
+        showDetail(n.id);
+      });
+      // 長押しで並び替えモードへ
+      setupLongPress(li);
+    } else {
+      // 並び替えモードのドラッグ
+      setupDrag(li);
+    }
     noteList.appendChild(li);
   });
 }
 
-function esc(str) {
-  return str.replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/"/g,"&quot;");
+// ── Long-press → sort mode ────────────────────────────────
+function setupLongPress(li) {
+  let timer = null;
+  const start = () => { timer = setTimeout(() => { enterSortMode(); }, 500); };
+  const cancel = () => { clearTimeout(timer); timer = null; };
+  li.addEventListener("touchstart", start,  {passive:true});
+  li.addEventListener("touchend",   cancel, {passive:true});
+  li.addEventListener("touchmove",  cancel, {passive:true});
+  li.addEventListener("mousedown",  start);
+  li.addEventListener("mouseup",    cancel);
+  li.addEventListener("mouseleave", cancel);
+}
+function enterSortMode() {
+  sortMode = true;
+  sortToggle.classList.add("active");
+  sortToggle.textContent = "完了";
+  searchEl.disabled = true;
+  hint.classList.add("show");
+  renderList();
 }
 
-// ── Events ───────────────────────────────────────────────────
-document.getElementById("add-btn").addEventListener("click", () => {
-  const n = makeNote();
-  notes.unshift(n);
-  save();
-  showDetail(n.id);
-});
+// ── Drag & Drop (touch + mouse) ───────────────────────────
+function setupDrag(li) {
+  const handle = li.querySelector(".drag-handle");
 
-document.getElementById("back-btn").addEventListener("click", showList);
+  // ── Touch ──
+  handle.addEventListener("touchstart", e => {
+    e.preventDefault();
+    dragEl = li;
+    li.classList.add("dragging");
+  }, {passive:false});
 
-document.getElementById("del-note-btn").addEventListener("click", () => {
-  if (!currentId) return;
-  if (!confirm("このメモを削除しますか？")) return;
-  notes = notes.filter(n => n.id !== currentId);
-  save();
-  showList();
-});
+  handle.addEventListener("touchmove", e => {
+    e.preventDefault();
+    if (!dragEl) return;
+    const y = e.touches[0].clientY;
+    noteList.querySelectorAll(".note-row").forEach(item => {
+      item.classList.remove("drag-over-top","drag-over-bottom");
+    });
+    const target = [...noteList.querySelectorAll(".note-row")].find(item => {
+      if (item === dragEl) return false;
+      const r = item.getBoundingClientRect();
+      return y >= r.top && y <= r.bottom;
+    });
+    if (target) {
+      const r = target.getBoundingClientRect();
+      const mid = r.top + r.height / 2;
+      target.classList.add(y < mid ? "drag-over-top" : "drag-over-bottom");
+    }
+  }, {passive:false});
 
-noteList.addEventListener("click", e => {
-  const btn = e.target.closest(".row-del");
-  if (!btn) return;
-  const id = Number(btn.dataset.id);
-  if (!confirm("このメモを削除しますか？")) return;
-  notes = notes.filter(n => n.id !== id);
-  save();
+  handle.addEventListener("touchend", e => {
+    if (!dragEl) return;
+    const rows = [...noteList.querySelectorAll(".note-row")];
+    const overTop    = rows.find(i => i.classList.contains("drag-over-top"));
+    const overBottom = rows.find(i => i.classList.contains("drag-over-bottom"));
+    const target = overTop || overBottom;
+    if (target && target !== dragEl) {
+      const fromId = Number(dragEl.dataset.id);
+      const toId   = Number(target.dataset.id);
+      const fi = notes.findIndex(n => n.id === fromId);
+      const ti = notes.findIndex(n => n.id === toId);
+      if (fi !== -1 && ti !== -1) {
+        const [moved] = notes.splice(fi, 1);
+        const newTi = notes.findIndex(n => n.id === toId);
+        const ins = overBottom ? newTi + 1 : newTi;
+        notes.splice(ins, 0, moved);
+        save();
+      }
+    }
+    dragEl.classList.remove("dragging");
+    rows.forEach(i => i.classList.remove("drag-over-top","drag-over-bottom"));
+    dragEl = null;
+    renderList();
+  }, {passive:false});
+
+  // ── Mouse ──
+  li.setAttribute("draggable","true");
+  li.addEventListener("dragstart", () => { dragEl = li; li.classList.add("dragging"); });
+  li.addEventListener("dragover", e => {
+    e.preventDefault();
+    noteList.querySelectorAll(".note-row").forEach(i => i.classList.remove("drag-over-top","drag-over-bottom"));
+    const r = li.getBoundingClientRect();
+    li.classList.add(e.clientY < r.top + r.height/2 ? "drag-over-top" : "drag-over-bottom");
+  });
+  li.addEventListener("dragleave", () => li.classList.remove("drag-over-top","drag-over-bottom"));
+  li.addEventListener("drop", e => {
+    e.preventDefault();
+    li.classList.remove("drag-over-top","drag-over-bottom");
+    if (!dragEl || dragEl === li) { dragEl=null; return; }
+    const fromId = Number(dragEl.dataset.id);
+    const toId   = Number(li.dataset.id);
+    const fi = notes.findIndex(n => n.id === fromId);
+    const ti = notes.findIndex(n => n.id === toId);
+    if (fi !== -1 && ti !== -1) {
+      const isBottom = li.classList.contains("drag-over-bottom") ||
+        e.clientY >= li.getBoundingClientRect().top + li.getBoundingClientRect().height/2;
+      const [moved] = notes.splice(fi,1);
+      const newTi = notes.findIndex(n => n.id === toId);
+      notes.splice(isBottom ? newTi+1 : newTi, 0, moved);
+      save(); renderList();
+    }
+    dragEl = null;
+  });
+  li.addEventListener("dragend", () => { li.classList.remove("dragging"); dragEl=null; });
+}
+
+// ── Sort toggle button ────────────────────────────────────
+sortToggle.addEventListener("click", () => {
+  sortMode = !sortMode;
+  sortToggle.classList.toggle("active", sortMode);
+  sortToggle.textContent = sortMode ? "完了" : "並替";
+  searchEl.disabled = sortMode;
+  hint.classList.toggle("show", sortMode);
   renderList();
 });
 
-searchEl.addEventListener("input", renderList);
+// ── Settings modal ────────────────────────────────────────
+document.getElementById("settings-btn").addEventListener("click", () => modalBg.classList.remove("hidden"));
+document.getElementById("modal-close").addEventListener("click", () => { modalBg.classList.add("hidden"); saveSettings(); });
+modalBg.addEventListener("click", e => { if(e.target===modalBg){ modalBg.classList.add("hidden"); saveSettings(); } });
 
-// Auto-save on edit
-function autoSave() {
+document.getElementById("list-fs-range").addEventListener("input", function() { applyListFs(+this.value); });
+
+// ── Editor font size (inline bar) ─────────────────────────
+document.getElementById("editor-fs-range").addEventListener("input", function() {
+  applyEditorFs(+this.value);
+  saveSettings();
+});
+
+// ── Save button ───────────────────────────────────────────
+document.getElementById("save-btn").addEventListener("click", () => {
+  if (!currentId) return;
+  manualSave();
+  // 一時的に「保存済み」表示
+  const btn = document.getElementById("save-btn");
+  btn.textContent = "✅ 保存済";
+  setTimeout(() => { btn.textContent = "💾 保存"; }, 1200);
+});
+
+function manualSave() {
   if (!currentId) return;
   const idx = notes.findIndex(n => n.id === currentId);
   if (idx === -1) return;
@@ -358,17 +454,100 @@ function autoSave() {
   detailDate.textContent = "最終更新: " + fmt(notes[idx].updatedAt);
   save();
 }
+
+// ── CSV export ────────────────────────────────────────────
+document.getElementById("csv-export-btn").addEventListener("click", () => {
+  const rows = [["id","title","body","updatedAt"]];
+  notes.forEach(n => rows.push([
+    n.id,
+    '"' + (n.title||"").replace(/"/g,'""') + '"',
+    '"' + (n.body ||"").replace(/"/g,'""') + '"',
+    n.updatedAt
+  ]));
+  const csv  = rows.map(r => r.join(",")).join("\r\n");
+  const blob = new Blob(["\uFEFF"+csv], {type:"text/csv;charset=utf-8"});
+  const url  = URL.createObjectURL(blob);
+  const a    = document.createElement("a");
+  a.href = url; a.download = "memo_"+new Date().toISOString().slice(0,10)+".csv"; a.click();
+  URL.revokeObjectURL(url);
+});
+
+// ── CSV import ────────────────────────────────────────────
+document.getElementById("csv-import-btn").addEventListener("click", () => document.getElementById("csv-import").click());
+document.getElementById("csv-import").addEventListener("change", function() {
+  const file = this.files[0]; if(!file) return;
+  const reader = new FileReader();
+  reader.onload = e => {
+    try {
+      const text  = e.target.result.replace(/^\uFEFF/,"");
+      const lines = text.split(/\r?\n/).filter(l=>l.trim());
+      const imported = [];
+      for (let i=1;i<lines.length;i++) {
+        const cols = parseCSVLine(lines[i]);
+        if (cols.length < 3) continue;
+        const id  = Number(cols[0]) || Date.now()+i;
+        const title = cols[1]||"無題のメモ", body=cols[2]||"";
+        const updatedAt = cols[3]||new Date().toISOString();
+        const ex = notes.findIndex(n=>n.id===id);
+        if (ex!==-1) notes[ex]={id,title,body,updatedAt};
+        else imported.push({id,title,body,updatedAt});
+      }
+      notes=[...imported,...notes]; save(); renderList();
+      alert(imported.length+"件取り込みました。");
+    } catch(err) { alert("CSVの読み込みに失敗しました: "+err.message); }
+  };
+  reader.readAsText(file,"UTF-8");
+  this.value="";
+});
+
+function parseCSVLine(line) {
+  const result=[]; let cur="",inQ=false;
+  for(let i=0;i<line.length;i++){
+    const c=line[i];
+    if(inQ){ if(c==='"'&&line[i+1]==='"'){cur+='"';i++;} else if(c==='"'){inQ=false;} else cur+=c; }
+    else { if(c==='"'){inQ=true;} else if(c===','){result.push(cur);cur="";} else cur+=c; }
+  }
+  result.push(cur); return result;
+}
+
+// ── Note CRUD ─────────────────────────────────────────────
+document.getElementById("add-btn").addEventListener("click", () => {
+  if (sortMode) return;
+  const n = makeNote(); notes.unshift(n); save(); showDetail(n.id);
+});
+document.getElementById("back-btn").addEventListener("click", () => { manualSave(); showList(); });
+document.getElementById("del-note-btn").addEventListener("click", () => {
+  if (!currentId) return;
+  if (!confirm("このメモを削除しますか？")) return;
+  notes = notes.filter(n => n.id !== currentId); save(); showList();
+});
+noteList.addEventListener("click", e => {
+  const btn = e.target.closest(".row-del"); if(!btn) return;
+  const id = Number(btn.dataset.id);
+  if (!confirm("このメモを削除しますか？")) return;
+  notes = notes.filter(n => n.id !== id); save(); renderList();
+});
+searchEl.addEventListener("input", renderList);
+
+// 自動保存（入力のたびに）
+function autoSave() {
+  if (!currentId) return;
+  const idx = notes.findIndex(n => n.id === currentId); if(idx===-1) return;
+  notes[idx].title     = titleEl.value || "無題のメモ";
+  notes[idx].body      = bodyEl.value;
+  notes[idx].updatedAt = new Date().toISOString();
+  detailDate.textContent = "最終更新: " + fmt(notes[idx].updatedAt);
+  save();
+}
 titleEl.addEventListener("input", autoSave);
 bodyEl.addEventListener("input",  autoSave);
 
-// ── Init ─────────────────────────────────────────────────────
+// ── Init ──────────────────────────────────────────────────
 load();
+loadSettings();
 showList();
 
-// ── Service Worker ───────────────────────────────────────────
-if ("serviceWorker" in navigator) {
-  navigator.serviceWorker.register("./sw.js").catch(() => {});
-}
+if ("serviceWorker" in navigator) navigator.serviceWorker.register("./sw.js").catch(()=>{});
 </script>
 </body>
 </html>
