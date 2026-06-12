@@ -14,42 +14,32 @@ jobs:
     - name: Checkout code
       uses: actions/checkout@v4
 
-    # 2. Node.js環境のセットアップ
+    # 2. Node.js環境のセットアップ（タイポを修正）
     - name: Setup Node.js
       uses: actions/setup-node@v4
       with:
-        node-size: '20'
+        node-version: '20'
 
-    # 3. Java環境（JDK 17）のセットアップ（Androidビルドに必要）
+    # 3. Java環境（JDK 17）のセットアップ
     - name: Set up JDK 17
       uses: actions/setup-java@v4
       with:
         java-version: '17'
         distribution: 'temurin'
 
-    # 4. Android SDKのセットアップ
-    - name: Setup Android SDK
-      uses: android-actions/setup-android@v3
+    # 4. PWABuilder CLIをインストール
+    - name: Install PWABuilder CLI
+      run: npm install -g @pwabuilder/cli
 
-    # 5. Google公式のBubblewrap CLIをインストール
-    - name: Install Bubblewrap
-      run: npm install -g @bubblewrap/cli
-
-    # 6. ダミーの署名鍵生成とAPKビルドの自動実行
-    # ※GitHub Pagesにデプロイ済みのURL（自分の環境）を指定します
-    - name: Build APK via Bubblewrap
+    # 5. PWAのURLからAndroidプロジェクト（APK）を自動生成
+    # ※あなたのGitHub PagesのURLを直接叩いてパッケージ化します
+    - name: Build APK via PWABuilder
       run: |
-        # ① PWAのWebマニフェストからAndroidプロジェクトの土台を自動生成
-        bubblewrap init --manifest=https://${{ github.repository_owner }}.github.io/${{ github.event.repository.name }}/manifest.json --pwa=https://${{ github.repository_owner }}.github.io/${{ github.event.repository.name }}/ --no-interactive
-        
-        # ② ビルドを実行（apkファイルが生成されます）
-        bubblewrap build --skipSigning --no-interactive
+        pwa-cli android --url https://${{ github.repository_owner }}.github.io/${{ github.event.repository.name }}/ --output ./build-output
 
-    # 7. 生成されたAPKをGitHub上に保存
+    # 6. 生成されたAPK（および関連ファイル）をGitHub上に保存
     - name: Upload APK Artifact
       uses: actions/upload-artifact@v4
       with:
         name: pwa-android-apk
-        path: |
-          ./*.apk
-          ./app-release-unsigned.apk
+        path: ./build-output/*
