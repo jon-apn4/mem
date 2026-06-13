@@ -176,7 +176,7 @@
       <button class="hbtn" id="del-note-btn">削除</button>
     </header>
     <div id="editor">
-      <input id="note-title" type="text" placeholder="タイトルを書いてください">
+      <input id="note-title" type="text" placeholder="ここに題名を書いてください">
       <textarea id="note-body" placeholder="ここに書き始めてください…"></textarea>
       <div id="fs-bar">
         <label for="editor-fs-range">文字</label>
@@ -256,8 +256,8 @@ function saveSettings() {
 
 function applyListFs(v) {
   const vv = +v;
-  // 行の最小高さ = フォントサイズ * 2.6（上下余白を含む自然な高さ）
-  const minH = Math.round(vv * 2.3);
+  // 行の最小高さ = フォントサイズ * 2.0（上下余白を含む自然な高さ）
+  const minH = Math.round(vv * 2.0);
   document.documentElement.style.setProperty("--list-fs", vv + "px");
   document.documentElement.style.setProperty("--row-min-h", minH + "px");
   listFsRange.value = vv;
