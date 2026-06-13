@@ -310,9 +310,9 @@ function setAutoSort(key, doRender = true) {
                 "title-desc":"sb-title-desc","title-asc":"sb-title-asc"};
   const el = document.getElementById(map[key]);
   if (el) el.classList.add("active");
-  // 手動並び替えボタン：手動モード以外では無効化
-  sortToggle.style.opacity = (key === "manual") ? "" : ".35";
-  sortToggle.style.pointerEvents = (key === "manual") ? "" : "none";
+// 完了ボタンは常に押せる
+sortToggle.style.opacity = "";
+sortToggle.style.pointerEvents = "";
   if (doRender) renderList();
 }
 
@@ -463,7 +463,6 @@ function setupLongPress(li) {
   li.addEventListener("mouseleave", cancel);
 }
 function enterSortMode() {
-  if (autoSortKey !== "manual") return; // 自動ソート中は手動並び替え不可
   sortMode = true;
   sortToggle.classList.add("active");
   sortToggle.textContent = "完了";
